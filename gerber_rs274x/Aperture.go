@@ -46,30 +46,30 @@ func renderApertureToSurfaceHelper(apertureTable map[int]*cairo.Surface, apertur
 	} else {
 		surface.SetSourceRGBA(1.0, 1.0, 1.0, 1.0)
 	}
-	
+
 	// First, remove the surface scaling (this is because the aperture surfaces are already scaled,
 	// and we don't want to scale twice
 	surface.Restore()
-	
+
 	var renderedAperture *cairo.Surface
 	var found bool
 
 	// Try to get the rendered aperture from the graphics state cache.  If it isn't in the cache,
 	// we need to actually render it, which will put it in the cache for future use
-	if renderedAperture,found = apertureTable[aperture.GetApertureNumber()]; !found {
+	if renderedAperture, found = apertureTable[aperture.GetApertureNumber()]; !found {
 		// If this is the first use of this aperture, it hasn't been rendered yet,
 		// so go ahead and render it before we draw it
 		aperture.renderApertureToGraphicsState(gfxState)
 		renderedAperture = apertureTable[aperture.GetApertureNumber()]
 	}
-	
+
 	// Render the aperture to the surface
-	surface.MaskSurface(renderedAperture, x * gfxState.scaleFactor, y * gfxState.scaleFactor) // Need to manually scale center coordinates here, because we've removed the surface scaling
-	
+	surface.MaskSurface(renderedAperture, x*gfxState.scaleFactor, y*gfxState.scaleFactor) // Need to manually scale center coordinates here, because we've removed the surface scaling
+
 	// Now, re-apply the surface scaling, so that subsequent draw operations can use the scaling
 	surface.Save()
 	surface.Scale(gfxState.scaleFactor, gfxState.scaleFactor)
-	
+
 	return nil
 }
 
@@ -77,7 +77,7 @@ func copyApertureSurface(source *cairo.Surface, gfxState *GraphicsState, antiali
 	// Create the new surface and initialize settings to be the same as the source surface
 	newSurface := cairo.NewSurface(cairo.FORMAT_ARGB32, source.GetWidth(), source.GetHeight())
 	newSurface.SetAntialias(antialias)
-	
+
 	// Copy the source surface to the new surface
 	if gfxState.currentLevelPolarity == DARK_POLARITY {
 		newSurface.SetSourceRGBA(0.0, 0.0, 0.0, 1.0)
@@ -85,10 +85,10 @@ func copyApertureSurface(source *cairo.Surface, gfxState *GraphicsState, antiali
 		newSurface.SetSourceRGBA(1.0, 1.0, 1.0, 1.0)
 	}
 	newSurface.MaskSurface(source, 0.0, 0.0)
-	
+
 	// Finally, apply the same transformations as the source surface, so it will behave like the source surface for future drawing operations
 	newSurface.Scale(scaleFactor, scaleFactor)
 	newSurface.Translate(xOffset, yOffset)
-	
+
 	return newSurface
-} 
+}

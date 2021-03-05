@@ -6,4 +6,5 @@ type DataBlock interface {
 	DataBlockPlaceholder()
 	ProcessDataBlockBoundsCheck(imageBounds *ImageBounds, gfxState *GraphicsState) error
 	ProcessDataBlockSurface(surface *cairo.Surface, gfxState *GraphicsState) error
+	ProcessDataBlockToolpath(*CamOutput, *GraphicsState) error
 }

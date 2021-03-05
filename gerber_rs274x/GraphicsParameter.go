@@ -2,43 +2,43 @@ package gerber_rs274x
 
 type ImageNameParameter struct {
 	paramCode ParameterCode
-	name string
+	name      string
 }
 
 type ImageRotationParameter struct {
 	paramCode ParameterCode
-	rotation int
+	rotation  int
 }
 
 type OffsetParameter struct {
-	paramCode ParameterCode
+	paramCode   ParameterCode
 	axisAOffset float64
 	axisBOffset float64
 }
 
 type AxisSelectParameter struct {
 	paramCode ParameterCode
-	isAXBY bool
+	isAXBY    bool
 }
 
 type ImagePolarityParameter struct {
 	paramCode ParameterCode
-	polarity Polarity
+	polarity  Polarity
 }
 
 type ScaleFactorParameter struct {
-	paramCode ParameterCode
+	paramCode  ParameterCode
 	axisAScale float64
 	axisBScale float64
 }
 
 type LevelNameParameter struct {
 	paramCode ParameterCode
-	name string
+	name      string
 }
 
 type MirrorImageParameter struct {
-	paramCode ParameterCode
+	paramCode   ParameterCode
 	axisAMirror bool
 	axisBMirror bool
 }

@@ -15,18 +15,18 @@ func (expr *OperatorExpression) EvaluateExpression(env *ExpressionEnvironment) f
 func (expr *OperatorExpression) String() string {
 	var operator string
 	switch expr.operator {
-		case OPERATOR_ADD:
-			operator = "Add"
-		
-		case OPERATOR_SUBTRACT:
-			operator = "Subtract"
-		
-		case OPERATOR_MULTIPLY:
-			operator = "Multiply"
-		
-		case OPERATOR_DIVIDE:
-			operator = "Divide"
+	case OPERATOR_ADD:
+		operator = "Add"
+
+	case OPERATOR_SUBTRACT:
+		operator = "Subtract"
+
+	case OPERATOR_MULTIPLY:
+		operator = "Multiply"
+
+	case OPERATOR_DIVIDE:
+		operator = "Divide"
 	}
-	
+
 	return fmt.Sprintf("{OperatorExpr, Operator: %s}", operator)
 }

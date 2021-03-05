@@ -6,11 +6,11 @@ import (
 )
 
 type PolygonPrimitive struct {
-	exposure ApertureMacroExpression
-	nVertices ApertureMacroExpression
-	centerX ApertureMacroExpression
-	centerY ApertureMacroExpression
-	diameter ApertureMacroExpression
+	exposure      ApertureMacroExpression
+	nVertices     ApertureMacroExpression
+	centerX       ApertureMacroExpression
+	centerY       ApertureMacroExpression
+	diameter      ApertureMacroExpression
 	rotationAngle ApertureMacroExpression
 }
 
@@ -27,7 +27,7 @@ func (primitive *PolygonPrimitive) GetPrimitiveBounds(env *ExpressionEnvironment
 	centerY := primitive.centerY.EvaluateExpression(env)
 	radius := primitive.diameter.EvaluateExpression(env) / 2.0
 
-	return centerX - radius,centerX + radius,centerY - radius,centerY + radius
+	return centerX - radius, centerX + radius, centerY - radius, centerY + radius
 }
 
 func (primitive *PolygonPrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, env *ExpressionEnvironment) error {
@@ -37,10 +37,10 @@ func (primitive *PolygonPrimitive) DrawPrimitiveToSurface(surface *cairo.Surface
 
 func (primitive *PolygonPrimitive) String() string {
 	return fmt.Sprintf("{Polygon, Exposure %v, Num Vertices %v, Center (%v %v), Diameter %v, Rotation %v}",
-						primitive.exposure,
-						primitive.nVertices,
-						primitive.centerX,
-						primitive.centerY,
-						primitive.diameter,
-						primitive.rotationAngle)
+		primitive.exposure,
+		primitive.nVertices,
+		primitive.centerX,
+		primitive.centerY,
+		primitive.diameter,
+		primitive.rotationAngle)
 }

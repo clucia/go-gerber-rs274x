@@ -8,8 +8,8 @@ import (
 type CirclePrimitive struct {
 	exposure ApertureMacroExpression
 	diameter ApertureMacroExpression
-	centerX ApertureMacroExpression
-	centerY ApertureMacroExpression
+	centerX  ApertureMacroExpression
+	centerY  ApertureMacroExpression
 }
 
 func (primitive *CirclePrimitive) AperturePrimitivePlaceholder() {
@@ -25,7 +25,7 @@ func (primitive *CirclePrimitive) GetPrimitiveBounds(env *ExpressionEnvironment)
 	centerY := primitive.centerY.EvaluateExpression(env)
 	radius := primitive.diameter.EvaluateExpression(env) / 2.0
 
-	return centerX - radius,centerX + radius,centerY - radius,centerY + radius
+	return centerX - radius, centerX + radius, centerY - radius, centerY + radius
 }
 
 func (primitive *CirclePrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, env *ExpressionEnvironment) error {

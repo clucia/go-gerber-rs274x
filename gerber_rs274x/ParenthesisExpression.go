@@ -22,11 +22,11 @@ func (expr *ParenthesisExpression) EvaluateExpression(env *ExpressionEnvironment
 func (expr *ParenthesisExpression) String() string {
 	var exprType string
 	switch expr.parenType {
-		case LEFT_PARENTHESIS:
-			exprType = "Left"
-		
-		case RIGHT_PARENTHESIS:
-			exprType = "Right"
+	case LEFT_PARENTHESIS:
+		exprType = "Left"
+
+	case RIGHT_PARENTHESIS:
+		exprType = "Right"
 	}
 
 	return fmt.Sprintf("{ParenthesisExpr, Type: %s}", exprType)

@@ -2,20 +2,20 @@ package gerber_rs274x
 
 import (
 	"fmt"
-	"math"
 	cairo "github.com/ungerik/go-cairo"
+	"math"
 )
 
 type PolygonAperture struct {
-	apertureNumber int
-	outerDiameter float64
-	numVertices int
+	apertureNumber  int
+	outerDiameter   float64
+	numVertices     int
 	rotationDegrees float64
 	Hole
 }
 
 func (aperture *PolygonAperture) AperturePlaceholder() {
-	
+
 }
 
 func (aperture *PolygonAperture) GetApertureNumber() int {
@@ -36,12 +36,12 @@ func (aperture *PolygonAperture) GetMinSize(gfxState *GraphicsState) float64 {
 
 func (aperture *PolygonAperture) DrawApertureBoundsCheck(bounds *ImageBounds, gfxState *GraphicsState, x float64, y float64) error {
 	radius := aperture.outerDiameter / 2.0
-	
+
 	xMin := x - radius
 	xMax := x + radius
 	yMin := y - radius
 	yMax := y + radius
-	
+
 	bounds.updateBounds(xMin, xMax, yMin, yMax)
 
 	return nil
@@ -52,8 +52,8 @@ func (aperture *PolygonAperture) DrawApertureSurface(surface *cairo.Surface, gfx
 	radius := aperture.outerDiameter / 2.0
 	correctedX := x - radius
 	correctedY := y - radius
-	
-	return renderApertureToSurface(aperture, surface, gfxState, correctedX, correctedY) 
+
+	return renderApertureToSurface(aperture, surface, gfxState, correctedX, correctedY)
 }
 
 func (aperture *PolygonAperture) DrawApertureSurfaceNoHole(surface *cairo.Surface, gfxState *GraphicsState, x float64, y float64) error {
@@ -61,8 +61,8 @@ func (aperture *PolygonAperture) DrawApertureSurfaceNoHole(surface *cairo.Surfac
 	radius := aperture.outerDiameter / 2.0
 	correctedX := x - radius
 	correctedY := y - radius
-	
-	return renderApertureNoHoleToSurface(aperture, surface, gfxState, correctedX, correctedY) 
+
+	return renderApertureNoHoleToSurface(aperture, surface, gfxState, correctedX, correctedY)
 }
 
 func (aperture *PolygonAperture) StrokeApertureLinear(surface *cairo.Surface, gfxState *GraphicsState, startX float64, startY float64, endX float64, endY float64) error {
@@ -81,7 +81,7 @@ func (aperture *PolygonAperture) renderApertureToGraphicsState(gfxState *Graphic
 	// This will render the aperture to a cairo surface the first time it is needed, then
 	// cache it in the graphics state.  Subsequent draws of the aperture will used the cached surface
 	radius := aperture.outerDiameter / 2.0
-	
+
 	// Construct the surface we're drawing to
 	imageSize := int(math.Ceil(aperture.outerDiameter * gfxState.scaleFactor))
 	surface := cairo.NewSurface(cairo.FORMAT_ARGB32, imageSize, imageSize)
@@ -89,62 +89,62 @@ func (aperture *PolygonAperture) renderApertureToGraphicsState(gfxState *Graphic
 	surface.Scale(gfxState.scaleFactor, gfxState.scaleFactor)
 	// Translate the surface so that the origin is actually the center of the image
 	surface.Translate(radius, radius)
-	
+
 	// Draw the aperture
 	if gfxState.currentLevelPolarity == DARK_POLARITY {
 		surface.SetSourceRGBA(0.0, 0.0, 0.0, 1.0)
 	} else {
 		surface.SetSourceRGBA(1.0, 1.0, 1.0, 1.0)
 	}
-	
+
 	vertexAngle := TWO_PI / float64(aperture.numVertices)
-	
+
 	// Save the current surface state so we can undo any
 	// rotations that we apply
 	surface.Save()
-	
+
 	// If there's a rotation, then apply it
-	if (aperture.rotationDegrees != 0.0) {
+	if aperture.rotationDegrees != 0.0 {
 		// Convert the angle to radians
 		correctedAngle := aperture.rotationDegrees * (math.Pi / 180.0)
-		
+
 		// Perform the rotation
-		surface.Rotate(correctedAngle) 
+		surface.Rotate(correctedAngle)
 	}
-	
+
 	// Move to the first vertex (on the x-axis)
 	surface.MoveTo(radius, 0.0)
 	// Draw the edges
 	for i := 1; i < aperture.numVertices; i++ {
-		xOffset := radius * math.Cos(float64(i) * vertexAngle)
-		yOffset := radius * math.Sin(float64(i) * vertexAngle)
+		xOffset := radius * math.Cos(float64(i)*vertexAngle)
+		yOffset := radius * math.Sin(float64(i)*vertexAngle)
 		surface.LineTo(xOffset, yOffset)
 	}
 	// One final draw to the starting vertex to close the polygon
 	surface.LineTo(radius, 0.0)
-	
+
 	surface.Fill()
-	
+
 	// Undo any rotations before we draw the hole
 	// (holes aren't affected by rotation)
 	surface.Restore()
-	
+
 	// Save the aperture reference before the hole (if any) is rendered, to the no-holes aperture map
 	gfxState.renderedAperturesNoHoles[aperture.apertureNumber] = surface
-	
+
 	// If present, remove the hole
 	if aperture.Hole != nil {
 		// If there's a hole, we need to create a copy surface and draw the hole on the copy
 		newSurface := copyApertureSurface(surface, gfxState, cairo.ANTIALIAS_DEFAULT, gfxState.scaleFactor, radius, radius)
 		aperture.DrawHoleSurface(newSurface)
-		
+
 		// Then, we save the rendered aperture with the hole to the graphics state
 		gfxState.renderedApertures[aperture.apertureNumber] = newSurface
 	} else {
 		// If there wasn't a hole, we can save the same surface reference as the no-hole aperture in the aperture map
 		gfxState.renderedApertures[aperture.apertureNumber] = surface
 	}
-	
+
 	gfxState.renderedApertures[aperture.apertureNumber].WriteToPNG(fmt.Sprintf("Aperture-%d.png", aperture.apertureNumber))
 }
 

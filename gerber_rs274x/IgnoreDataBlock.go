@@ -2,6 +2,7 @@ package gerber_rs274x
 
 import (
 	"fmt"
+
 	cairo "github.com/ungerik/go-cairo"
 )
 
@@ -14,6 +15,11 @@ func (ignoreDataBlock *IgnoreDataBlock) DataBlockPlaceholder() {
 }
 
 func (ignoreDataBlock *IgnoreDataBlock) ProcessDataBlockBoundsCheck(imageBounds *ImageBounds, gfxState *GraphicsState) error {
+	// This is a comment, so it doesn't change the graphics state or draw anything
+	return nil
+}
+
+func (ignoreDataBlock *IgnoreDataBlock) ProcessDataBlockToolpath(*CamOutput, *GraphicsState) error {
 	// This is a comment, so it doesn't change the graphics state or draw anything
 	return nil
 }

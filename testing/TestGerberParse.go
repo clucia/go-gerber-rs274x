@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
-	"gerber_rs274x"
+	"github.com/go-gerber-rs274x/gerber_rs274x"
 	"path/filepath"
 )
 

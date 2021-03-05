@@ -2,20 +2,20 @@ package gerber_rs274x
 
 import (
 	"fmt"
-	"math"
 	cairo "github.com/ungerik/go-cairo"
+	"math"
 )
 
 type MoirePrimitive struct {
-	centerX ApertureMacroExpression
-	centerY ApertureMacroExpression
-	outerDiameter ApertureMacroExpression
-	ringThickness ApertureMacroExpression
-	ringGap ApertureMacroExpression
-	maxRings ApertureMacroExpression
+	centerX            ApertureMacroExpression
+	centerY            ApertureMacroExpression
+	outerDiameter      ApertureMacroExpression
+	ringThickness      ApertureMacroExpression
+	ringGap            ApertureMacroExpression
+	maxRings           ApertureMacroExpression
 	crosshairThickness ApertureMacroExpression
-	crosshairLength ApertureMacroExpression
-	rotationAngle ApertureMacroExpression
+	crosshairLength    ApertureMacroExpression
+	rotationAngle      ApertureMacroExpression
 }
 
 func (primitive *MoirePrimitive) AperturePrimitivePlaceholder() {
@@ -33,7 +33,7 @@ func (primitive *MoirePrimitive) GetPrimitiveBounds(env *ExpressionEnvironment) 
 	crosshairRadius := primitive.crosshairLength.EvaluateExpression(env) / 2.0
 	maxRadius := math.Max(ringRadius, crosshairRadius)
 
-	return centerX - maxRadius,centerX + maxRadius,centerY - maxRadius,centerY + maxRadius
+	return centerX - maxRadius, centerX + maxRadius, centerY - maxRadius, centerY + maxRadius
 }
 
 func (primitive *MoirePrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, env *ExpressionEnvironment) error {
@@ -42,18 +42,18 @@ func (primitive *MoirePrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, 
 	centerX := primitive.centerX.EvaluateExpression(env)
 	centerY := primitive.centerY.EvaluateExpression(env)
 	rotation := primitive.rotationAngle.EvaluateExpression(env) * (math.Pi / 180.0)
-	
+
 	if rotation != 0.0 && (centerX != 0.0 || centerY != 0.0) {
 		return fmt.Errorf("Moire primitive rotation is only allowed if the center is at the origin")
 	}
-	
+
 	// Now that we've checked the center, first apply a translation to account for the offset,
 	// then apply the rotation
 	surface.Save()
 	surface.Rotate(rotation)
-	
+
 	surface.SetSourceRGBA(0.0, 0.0, 0.0, 1.0)
-	
+
 	// Start drawing the rings
 	maxRings := int(primitive.maxRings.EvaluateExpression(env))
 	radius := (primitive.outerDiameter.EvaluateExpression(env) / 2.0)
@@ -62,10 +62,10 @@ func (primitive *MoirePrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, 
 	for ring := 0; ring < maxRings; ring++ {
 		outerRadius := radius - ((thickness + gap) * float64(ring))
 		innerRadius := outerRadius - thickness
-		
+
 		// Draw the outer portion of the ring
 		surface.Arc(centerX, centerY, outerRadius, 0.0, TWO_PI)
-		
+
 		if innerRadius > 0.0 {
 			// Draw the inner portion of the ring
 			surface.Arc(centerX, centerY, innerRadius, 0.0, TWO_PI)
@@ -76,7 +76,7 @@ func (primitive *MoirePrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, 
 			break
 		}
 	}
-	
+
 	// Now, draw the crosshair
 	crosshairHalfLength := (primitive.crosshairLength.EvaluateExpression(env) / 2.0)
 	crosshairHalfThickness := (primitive.crosshairThickness.EvaluateExpression(env) / 2.0)
@@ -102,25 +102,25 @@ func (primitive *MoirePrimitive) DrawPrimitiveToSurface(surface *cairo.Surface, 
 	surface.LineTo(vertLeftX, vertBottomY)
 	surface.LineTo(vertLeftX, vertTopY)
 	surface.Fill()
-	
+
 	fmt.Printf("Horizontal Top Left (%f %f) Bottom Right (%f %f)\n", horzLeftX, horzTopY, horzRightX, horzBottomY)
 	fmt.Printf("Vertical Top Left (%f %f) Bottom Right (%f %f)\n", vertLeftX, vertTopY, vertRightX, vertBottomY)
-	
+
 	// Finally, undo the transformations to the surface
 	surface.Restore()
-	
+
 	return nil
 }
 
 func (primitive *MoirePrimitive) String() string {
 	return fmt.Sprintf("{Moire, Center (%v %v), Outer Diameter %v, Ring Thickness %v, Ring Gap %v, Max Rings %v, Crosshair Thickness %v, CrosshairLength %v, Rotation %v}",
-						primitive.centerX,
-						primitive.centerY,
-						primitive.outerDiameter,
-						primitive.ringThickness,
-						primitive.ringGap,
-						primitive.maxRings,
-						primitive.crosshairThickness,
-						primitive.crosshairLength,
-						primitive.rotationAngle)
+		primitive.centerX,
+		primitive.centerY,
+		primitive.outerDiameter,
+		primitive.ringThickness,
+		primitive.ringGap,
+		primitive.maxRings,
+		primitive.crosshairThickness,
+		primitive.crosshairLength,
+		primitive.rotationAngle)
 }
