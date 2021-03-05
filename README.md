@@ -13,7 +13,23 @@ The Oblong shape is being rendered as a rectangle as well.
 
 There is a lot of room to improve the gcode generation.
 
+Installation
+============
 
+git clone https://github.com/clucia/go-gerber-rs274x
+cd go-gerber-rs274x/cam
+go get ./...
+go build
+
+## Generate a Gcode file:
+./cam ~/Documents/electronics/test-amp-4/amp/amp-F_Cu.gbr
+
+cd ../testing
+go get ./...
+go build
+
+## Generate a PNG:
+./testing ~/Documents/electronics/test-amp-4/amp/amp-F_Cu.gbr
 
 Pictures
 ========
