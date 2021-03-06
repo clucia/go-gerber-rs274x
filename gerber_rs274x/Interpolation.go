@@ -33,7 +33,33 @@ func (interpolation *Interpolation) flashMacro(camo *CamOutput, gfxState *Graphi
 	interpolation.flashRectangle(camo, gfxState, rect)
 }
 
-func (interpolation *Interpolation) flashRectangle(camo *CamOutput, gfxState *GraphicsState, rect *RectangleAperture) {
+func (interpolation *Interpolation) flashRectangleTall(camo *CamOutput, gfxState *GraphicsState, rect *RectangleAperture) {
+	fmt.Println("\tRRR", rect)
+	cx, cy := camo.tranlateScale(interpolation.x, interpolation.y)
+	// cx, cy := interpolation.x, interpolation.y
+	xsiz := rect.xSize
+	ysiz := rect.ySize
+	tw := camo.toolWidth
+	tw2 := tw / 2.0
+
+	dx := xsiz / 2.0
+	dy := ysiz / 2.0
+	fmt.Println(camo.wrt, "; Rectangle: cx = ", cx, ", cy = ", cy, ", xsiz = ", xsiz, ", ysiz = ", ysiz)
+	fmt.Fprintln(camo.wrt, "\t\t; Rectangle: cx = ", cx, ", cy = ", cy, ", xsiz = ", xsiz, ", ysiz = ", ysiz)
+	x := -dx
+	fmt.Fprintf(camo.wrt, "G00X%fY%f\n", cx+x, cy-dy)
+	fmt.Fprintf(camo.wrt, "M03S%d\n", camo.power)
+	for ; x <= dx; x += tw {
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x, cy+dy)
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw2, cy+dy)
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw2, cy-dy)
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw, cy-dy)
+	}
+	fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x, cy+dy)
+	fmt.Fprintf(camo.wrt, "M05\n")
+}
+
+func (interpolation *Interpolation) flashRectangleWide(camo *CamOutput, gfxState *GraphicsState, rect *RectangleAperture) {
 	fmt.Println("\tRRR", rect)
 	cx, cy := camo.tranlateScale(interpolation.x, interpolation.y)
 	// cx, cy := interpolation.x, interpolation.y
@@ -45,14 +71,28 @@ func (interpolation *Interpolation) flashRectangle(camo *CamOutput, gfxState *Gr
 	dy := ysiz / 2.0
 	fmt.Println(camo.wrt, "; Rectangle: cx = ", cx, ", cy = ", cy, ", xsiz = ", xsiz, ", ysiz = ", ysiz)
 	fmt.Fprintln(camo.wrt, "\t\t; Rectangle: cx = ", cx, ", cy = ", cy, ", xsiz = ", xsiz, ", ysiz = ", ysiz)
-	fmt.Fprintf(camo.wrt, "G00X%fY%f\n", cx+dx, cy-dy)
+
+	y := -dy
+	fmt.Fprintf(camo.wrt, "G00X%fY%f\n", cx-dx, cy+y)
 	fmt.Fprintf(camo.wrt, "M03S%d\n", camo.power)
-	for x := -dx; x < dx; x += tw / 2.0 {
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x, cy+dy)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw/2.0, cy-dy)
+
+	tw2 := tw / 2.0
+	for ; y <= dy; y += tw {
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+y)
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+y+tw2)
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx-dx, cy+y+tw2)
+		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx-dx, cy+y+tw)
 	}
-	fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+dy)
+	fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+y)
 	fmt.Fprintf(camo.wrt, "M05\n")
+}
+
+func (interpolation *Interpolation) flashRectangle(camo *CamOutput, gfxState *GraphicsState, rect *RectangleAperture) {
+	if rect.xSize < rect.ySize {
+		interpolation.flashRectangleTall(camo, gfxState, rect)
+	} else {
+		interpolation.flashRectangleWide(camo, gfxState, rect)
+	}
 }
 
 func flashCircle(cx, cy, dia float64, camo *CamOutput, gfxState *GraphicsState) {
@@ -65,8 +105,9 @@ func flashCircle(cx, cy, dia float64, camo *CamOutput, gfxState *GraphicsState) 
 	fmt.Fprintf(camo.wrt, "M03S%d\n", camo.power)
 
 	var tw = camo.toolWidth
+	tw2 := tw / 2.0
 
-	for dx := -rad + tw; dx < rad; dx += tw / 2.0 {
+	for dx := -rad + tw2; dx < rad; dx += tw2 {
 		dy := math.Sqrt(math.Pow(rad, 2.0) - math.Pow(dx, 2.0))
 		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+dy)
 		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy-dy)
@@ -132,8 +173,8 @@ func (interpolation *Interpolation) makeTrace(camo *CamOutput, gfxState *Graphic
 	ap := gfxState.apertures[apn].(*CircleAperture)
 	dia := ap.diameter
 
-	flashCircle(x0, y0, dia, camo, gfxState)
 	flashCircle(x1, y1, dia, camo, gfxState)
+	flashCircle(x0, y0, dia, camo, gfxState)
 
 	// A little hacky, but, flashCircle also does the translate/scale
 	x0, y0 = camo.tranlateScale(x0, y0)

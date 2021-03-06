@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"../gerber_rs274x"
+	"github.com/clucia/go-gerber-rs274x/gerber_rs274x"
 )
 
 func main() {
