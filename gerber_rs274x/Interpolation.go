@@ -117,7 +117,7 @@ func flashCircle(cx, cy, dia float64, camo *CamOutput, gfxState *GraphicsState) 
 }
 func (interpolation *Interpolation) flashObround(camo *CamOutput, gfxState *GraphicsState, obro *ObroundAperture) {
 	fmt.Println("\tOOO", obro)
-	fmt.Fprintln(camo.wrt, "======= HACK =====")
+	fmt.Fprintln(camo.wrt, "; ======= HACK =====")
 	rect := &RectangleAperture{
 		xSize: obro.xSize,
 		ySize: obro.ySize,
