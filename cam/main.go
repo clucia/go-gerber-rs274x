@@ -41,7 +41,7 @@ func main() {
 			panic("")
 		}
 
-		camo := gerber_rs274x.NewCamOutput(f, .2, 0, 0, 5)
+		camo := gerber_rs274x.NewCamOutput(f, 300, .2, 0, 0, 10)
 
 		if err := gerber_rs274x.GenerateToolpath(camo, parsedFile); err != nil {
 			fmt.Printf("Error generating PNG file: %s\n", err.Error())

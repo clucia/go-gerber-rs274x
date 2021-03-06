@@ -164,7 +164,7 @@ func GenerateToolpath(camo *CamOutput, parsedFile []DataBlock) error {
 	gfxState := newGraphicsState(bounds, width, height)
 	fmt.Fprintf(camo.wrt, "; My CAM\n")
 	fmt.Fprintf(camo.wrt, "G90G40G17G21\n")
-	fmt.Fprintf(camo.wrt, "F1800\n")
+	fmt.Fprintf(camo.wrt, "F300\n")
 
 	fmt.Fprintf(camo.wrt, "; X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)
 	fmt.Printf("X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)

@@ -50,12 +50,12 @@ func (interpolation *Interpolation) flashRectangleTall(camo *CamOutput, gfxState
 	fmt.Fprintf(camo.wrt, "G00X%fY%f\n", cx+x, cy-dy)
 	fmt.Fprintf(camo.wrt, "M03S%d\n", camo.power)
 	for ; x <= dx; x += tw {
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x, cy+dy)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw2, cy+dy)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw2, cy-dy)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x+tw, cy-dy)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+x, cy+dy, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+x+tw2, cy+dy, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+x+tw2, cy-dy, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+x+tw, cy-dy, camo.feedrate)
 	}
-	fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+x, cy+dy)
+	fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+x, cy+dy, camo.feedrate)
 	fmt.Fprintf(camo.wrt, "M05\n")
 }
 
@@ -78,12 +78,12 @@ func (interpolation *Interpolation) flashRectangleWide(camo *CamOutput, gfxState
 
 	tw2 := tw / 2.0
 	for ; y <= dy; y += tw {
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+y)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+y+tw2)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx-dx, cy+y+tw2)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx-dx, cy+y+tw)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+dx, cy+y, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+dx, cy+y+tw2, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx-dx, cy+y+tw2, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx-dx, cy+y+tw, camo.feedrate)
 	}
-	fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+y)
+	fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+dx, cy+y, camo.feedrate)
 	fmt.Fprintf(camo.wrt, "M05\n")
 }
 
@@ -109,10 +109,10 @@ func flashCircle(cx, cy, dia float64, camo *CamOutput, gfxState *GraphicsState) 
 
 	for dx := -rad + tw2; dx < rad; dx += tw2 {
 		dy := math.Sqrt(math.Pow(rad, 2.0) - math.Pow(dx, 2.0))
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy+dy)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+dx, cy-dy)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+dx, cy+dy, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+dx, cy-dy, camo.feedrate)
 	}
-	fmt.Fprintf(camo.wrt, "G01X%fY%f\n", cx+rad, cy)
+	fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", cx+rad, cy, camo.feedrate)
 	fmt.Fprintf(camo.wrt, "M05\n")
 }
 func (interpolation *Interpolation) flashObround(camo *CamOutput, gfxState *GraphicsState, obro *ObroundAperture) {
@@ -209,10 +209,10 @@ func (interpolation *Interpolation) makeTrace(camo *CamOutput, gfxState *Graphic
 	for i0 := -r; i0 < r; i0 += camo.toolWidth {
 		i1 := i0 + camo.toolWidth/2.0
 
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", x0-i0*cos, y0+i0*sin)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", x1-i0*cos, y1+i0*sin)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", x1-i1*cos, y1+i1*sin)
-		fmt.Fprintf(camo.wrt, "G01X%fY%f\n", x0-i1*cos, y0+i1*sin)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", x0-i0*cos, y0+i0*sin, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", x1-i0*cos, y1+i0*sin, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", x1-i1*cos, y1+i1*sin, camo.feedrate)
+		fmt.Fprintf(camo.wrt, "G01X%fY%fF%d\n", x0-i1*cos, y0+i1*sin, camo.feedrate)
 	}
 	fmt.Fprintf(camo.wrt, "M05\n")
 }
