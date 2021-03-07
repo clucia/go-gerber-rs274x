@@ -101,13 +101,13 @@ func NewDrlData() *DrlData {
 }
 
 type DrlCAM struct {
-	wrt           io.WriteCloser
-	changeZ       float64
-	safeZ         float64
-	drillZ        float64
-	drillF        int
-	tooln         int
-	tranlateScale func(float64, float64) (float64, float64)
+	wrt            io.WriteCloser
+	changeZ        float64
+	safeZ          float64
+	drillZ         float64
+	drillF         int
+	tooln          int
+	translateScale func(float64, float64) (float64, float64)
 }
 
 type DrillBounds struct {
@@ -120,7 +120,7 @@ type DrillBounds struct {
 func (drl *DrlData) genDrillHole(cam *DrlCAM, st *Step) {
 	w := cam.wrt
 	fmt.Fprintf(w, "G00Z%f\n", cam.safeZ)
-	x, y := cam.tranlateScale(st.x, st.y)
+	x, y := cam.translateScale(st.x, st.y)
 	fmt.Fprintf(w, "G00X%fY%f\n", x, y)
 	fmt.Fprintf(w, "M3S10000\n")
 	fmt.Fprintf(w, "G01Z%fF%d\n", cam.drillZ, cam.drillF)
@@ -223,7 +223,7 @@ func main() {
 		safeZ:   1.0,
 		drillZ:  -3.0,
 		drillF:  20,
-		tranlateScale: func(x float64, y float64) (x0 float64, y0 float64) {
+		translateScale: func(x float64, y float64) (x0 float64, y0 float64) {
 			return x - bounds.xMin, y - bounds.yMin
 		},
 	}

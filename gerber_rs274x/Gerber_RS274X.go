@@ -169,7 +169,7 @@ func GenerateToolpath(camo *CamOutput, parsedFile []DataBlock) error {
 	fmt.Fprintf(camo.wrt, "; X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)
 	fmt.Printf("X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)
 
-	camo.tranlateScale = func(x, y float64) (x1, y1 float64) {
+	camo.translateScale = func(x, y float64) (x1, y1 float64) {
 		return x - bounds.xMin, y - bounds.yMin
 	}
 
@@ -182,6 +182,17 @@ func GenerateToolpath(camo *CamOutput, parsedFile []DataBlock) error {
 		}
 	}
 	return nil
+}
+
+func GenerateBounds(parsedFile []DataBlock, bounds *ImageBounds) (err error) {
+	gfxStateBounds := newGraphicsState(nil, 0, 0)
+	for _, dataBlock := range parsedFile {
+		if err = dataBlock.ProcessDataBlockBoundsCheck(bounds, gfxStateBounds); err != nil {
+			return err
+		}
+	}
+	fmt.Printf("X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)
+	return err
 }
 
 func GenerateSurface(outFileName string, parsedFile []DataBlock) error {

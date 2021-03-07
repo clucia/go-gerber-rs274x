@@ -14,6 +14,14 @@ func newImageBounds() *ImageBounds {
 	return bounds
 }
 
+func (bounds *ImageBounds) Get() (xMin float64, xMax float64, yMin float64, yMax float64) {
+	return bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax
+}
+
+func (bounds *ImageBounds) UpdateBounds(xMin float64, xMax float64, yMin float64, yMax float64) {
+	bounds.updateBounds(xMin, xMax, yMin, yMax)
+}
+
 func (bounds *ImageBounds) updateBounds(xMin float64, xMax float64, yMin float64, yMax float64) {
 	// If we haven't seen any bounds yet, we just set the mins and maxes
 	// Otherwise, we only update them if they're bigger or smaller

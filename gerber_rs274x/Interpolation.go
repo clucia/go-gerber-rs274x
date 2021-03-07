@@ -35,7 +35,7 @@ func (interpolation *Interpolation) flashMacro(camo *CamOutput, gfxState *Graphi
 
 func (interpolation *Interpolation) flashRectangleTall(camo *CamOutput, gfxState *GraphicsState, rect *RectangleAperture) {
 	fmt.Println("\tRRR", rect)
-	cx, cy := camo.tranlateScale(interpolation.x, interpolation.y)
+	cx, cy := camo.translateScale(interpolation.x, interpolation.y)
 	// cx, cy := interpolation.x, interpolation.y
 	xsiz := rect.xSize
 	ysiz := rect.ySize
@@ -61,7 +61,7 @@ func (interpolation *Interpolation) flashRectangleTall(camo *CamOutput, gfxState
 
 func (interpolation *Interpolation) flashRectangleWide(camo *CamOutput, gfxState *GraphicsState, rect *RectangleAperture) {
 	fmt.Println("\tRRR", rect)
-	cx, cy := camo.tranlateScale(interpolation.x, interpolation.y)
+	cx, cy := camo.translateScale(interpolation.x, interpolation.y)
 	// cx, cy := interpolation.x, interpolation.y
 	xsiz := rect.xSize
 	ysiz := rect.ySize
@@ -96,7 +96,7 @@ func (interpolation *Interpolation) flashRectangle(camo *CamOutput, gfxState *Gr
 }
 
 func flashCircle(cx, cy, dia float64, camo *CamOutput, gfxState *GraphicsState) {
-	cx, cy = camo.tranlateScale(cx, cy)
+	cx, cy = camo.translateScale(cx, cy)
 	fmt.Println(camo.wrt, "; Circle: cx = ", cx, ", cy = ", cy, ", dia = ", dia)
 	rad := dia / 2.0
 	fmt.Println("\t\tcx = ", cx, ", cy = ", cy, ", dia = ", dia)
@@ -149,7 +149,7 @@ func (interpolation *Interpolation) flashOp(camo *CamOutput, gfxState *GraphicsS
 
 func (interpolation *Interpolation) gcodeG00(camo *CamOutput) {
 
-	cx, cy := camo.tranlateScale(interpolation.x, interpolation.y)
+	cx, cy := camo.translateScale(interpolation.x, interpolation.y)
 	fmt.Fprintf(camo.wrt, "G00")
 	if interpolation.xValid {
 		fmt.Fprintf(camo.wrt, "X%f", cx)
@@ -177,8 +177,8 @@ func (interpolation *Interpolation) makeTrace(camo *CamOutput, gfxState *Graphic
 	flashCircle(x0, y0, dia, camo, gfxState)
 
 	// A little hacky, but, flashCircle also does the translate/scale
-	x0, y0 = camo.tranlateScale(x0, y0)
-	x1, y1 = camo.tranlateScale(x1, y1)
+	x0, y0 = camo.translateScale(x0, y0)
+	x1, y1 = camo.translateScale(x1, y1)
 
 	r := dia / 2
 	dx := x1 - x0
