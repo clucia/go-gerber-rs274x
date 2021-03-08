@@ -169,9 +169,9 @@ func GenerateToolpath(camo *CamOutput, parsedFile []DataBlock) error {
 	fmt.Fprintf(camo.wrt, "; X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)
 	fmt.Printf("X Bounds: (%f %f) Y Bounds: (%f %f)\n", bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax)
 
-	camo.translateScale = func(x, y float64) (x1, y1 float64) {
+	/*camo.translateScale = func(x, y float64) (x1, y1 float64) {
 		return x - bounds.xMin, y - bounds.yMin
-	}
+	}*/
 
 	for i, dataBlock := range parsedFile {
 		if i == 61 {

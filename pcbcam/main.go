@@ -8,36 +8,41 @@ import (
 )
 
 type Layer struct {
-	name  string
-	typ   string
-	fname string
-	fext  string
+	name   string
+	typ    string
+	fname  string
+	fext   string
+	mirror bool
 }
 
 var layers = []*Layer{
 	{
-		name:  "Front Copper",
-		typ:   "COPPER",
-		fname: "-F_Cu",
-		fext:  ".gbr",
+		name:   "Front Copper",
+		typ:    "COPPER",
+		fname:  "-F_Cu",
+		fext:   ".gbr",
+		mirror: true,
 	},
 	{
-		name:  "Back Copper",
-		typ:   "COPPER",
-		fname: "-B_Cu",
-		fext:  ".gbr",
+		name:   "Back Copper",
+		typ:    "COPPER",
+		fname:  "-B_Cu",
+		fext:   ".gbr",
+		mirror: true,
 	},
 	{
-		name:  "Edge Cuts",
-		typ:   "EDGE",
-		fname: "-Edge_Cuts",
-		fext:  ".gbr",
+		name:   "Edge Cuts",
+		typ:    "EDGE",
+		fname:  "-Edge_Cuts",
+		fext:   ".gbr",
+		mirror: false,
 	},
 	{
-		name:  "Drill",
-		typ:   "DRILL",
-		fname: "",
-		fext:  ".drl",
+		name:   "Drill",
+		typ:    "DRILL",
+		fname:  "",
+		fext:   ".drl",
+		mirror: false,
 	},
 }
 
@@ -87,10 +92,20 @@ func main() {
 	}
 
 	fmt.Println("bounds = ", bounds)
-	xMin, _, yMin, _ := bounds.Get()
+	xMin, xMax, yMin, _ := bounds.Get()
 	tsFunc := func(x float64, y float64) (x0 float64, y0 float64) {
 		// xMin, _, yMin, _ := bounds.Get()
 		return x - xMin, y - yMin
+	}
+
+	tsmFunc := func(x float64, y float64) (x0 float64, y0 float64) {
+		// xMin, _, yMin, _ := bounds.Get()
+		xrange := xMax - xMin
+		x = (x - xMin) / xrange
+		x0 = 1 - x
+		x0 = x0*xrange + xMin
+		y0 = y
+		return //
 	}
 
 	var outputFile *os.File
@@ -101,7 +116,12 @@ func main() {
 			if err != nil {
 				panic("")
 			}
-			camo := gerber_rs274x.NewCamOutput(outputFile, 300, .2, 0, 0, 10, tsFunc)
+			var camo *gerber_rs274x.CamOutput
+			if layers[i].mirror {
+				camo = gerber_rs274x.NewCamOutput(outputFile, 300, .2, 0, 0, 10, tsmFunc)
+			} else {
+				camo = gerber_rs274x.NewCamOutput(outputFile, 300, .2, 0, 0, 10, tsFunc)
+			}
 			err := gerber_rs274x.GenerateToolpath(camo, ASTs[i].([]gerber_rs274x.DataBlock))
 			if err != nil {
 				fmt.Printf("Error generating toolpath file: %s\n", err.Error())
@@ -118,6 +138,8 @@ func main() {
 			camo := &gerber_rs274x.DrlCAM{Wrt: outputFile, ChangeZ: 15.0, SafeZ: 1.0, DrillZ: -3.0, DrillF: 20, TranslateScale: tsFunc}
 			ASTs[i].(*gerber_rs274x.DrlData).GenGcode(camo)
 			outputFile.Close()
+		default:
+			fmt.Println("Unimpl ", ext.typ)
 		}
 	}
 }
